@@ -1,0 +1,583 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!-- 
+ ********************************************************************************
+ *
+ * Copyright (C) 2006 Jorge Ruesga
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ ********************************************************************************
+-->
+
+<project name="jmsmq" default="all" basedir=".">
+
+<!-- ===================== Property Definitions =========================== -->
+
+<!--
+
+  Each of the following properties are used in the build script.
+  Values for these properties are set by the first place they are
+  defined, from the following list:
+  * Definitions on the "ant" command line (ant -Dcatalina.home=xyz compile)
+  * Definitions from a "build.properties" file in the top level
+    source directory
+  * Definitions from a "build.properties" file in the developer's
+    home directory
+  * Default definitions in this build.xml file
+
+  You will note below that property values can be composed based on the
+  contents of previously defined properties.  This is a powerful technique
+  that helps you minimize the number of changes required when your development
+  environment is modified.  Note that property composition is allowed within
+  "build.properties" files as well as in the "build.xml" script.
+
+-->
+
+  <property file="build.properties"/>
+  <property file="${user.home}/build.properties"/>
+
+<!-- ==================== File and Directory Names ======================== -->
+
+<!--
+
+  These properties generally define file and directory names (or paths) that
+  affect where the build process stores its outputs.
+
+  app.name             Base name of this application, used to
+                       construct filenames and directories.
+                       Defaults to "myapp".
+
+  app.version.release  Version release of this application
+
+  app.version.major	   Version major of this application
+
+  app.version.minor	   Version minor of this application
+
+  app.version		   Version of this application
+
+  app.description	   Description of this application
+
+  app.path			   Application path
+
+  app.test.path		   Application path
+
+  app.package		   Application package
+
+  app.test.package	   Application package
+
+  build.home           The directory into which the "prepare" and
+                       "compile" targets will generate their output.
+                       Defaults to "build".
+					  
+  build.java.home      The directory into which the "prepare" and
+                       "compile" Java targets will generate their output.
+                       Defaults to "build/java".
+
+  build.c.home         The directory into which the "prepare" and
+                       "compile" C targets will generate their output.
+                       Defaults to "build/c".
+
+  build.c.lib.home     The directory into which the "prepare" and
+                       "reimp" C libraries need for c compilation.
+                       Defaults to "build/c/lib".
+
+  src.home             The directory for the source files. Defaults to "src".
+
+  src.java.home        The directory for the java source files. Defaults to "src/java".
+
+  src.c.home		   The directory for the C source files. Defaults to "src/c".
+
+  docs.home            The directory into which the documentation files
+                       will generate their output. Defaults to "docs".
+
+  docs.javadocs.home   The directory into which the java documentation files
+                       will generate their output. Defaults to "docs/javadocs".
+
+  dist.home            The name of the base directory in which
+                       distribution files are created.
+                       Defaults to "dist".
+
+  dist.java.home       The name of the base directory in which
+                       Java distribution files are created.
+                       Defaults to "dist/jar".
+					  
+  dist.c.home		   The name of the base directory in which
+                       C distribution files are created.
+                       Defaults to "dist/dll/win32/wnt".
+
+  package.home		   The name of the base directory in which
+                       binary and source files are zippend.
+                       Defaults to "package".
+
+  include.home         The name of the base directory in which
+                       are the includes needed for compilation.
+                       Defaults to "include".
+
+  lib.home             The name of the base directory in which
+                       are the libraries needed for compilation.
+                       Defaults to "lib".
+
+  test.home            The name of the base directory in which
+                       are the test suites.
+                       Defaults to "test".
+-->
+
+  <property name="app.name"					value="jmsmq"/>
+  <property name="app.version.release"		value="0"/>
+  <property name="app.version.major"		value="0"/>
+  <property name="app.version.minor"		value="1"/>
+  <property name="app.version"				value="${app.version.release}.${app.version.major}.${app.version.minor}"/>
+  <property name="app.description"			value="Java Microsoft® Message Queuing Library"/>
+  <property name="app.path"					value="net" />
+  <property name="app.package"				value="net" />
+  <property name="app.test.path"			value="test" />
+  <property name="app.test.package"			value="test" />
+  <property name="build.home"				value="build"/>
+  <property name="build.java.home"			value="${build.home}/java"/>
+  <property name="build.c.home"				value="${build.home}/c"/>
+  <property name="build.c.lib.home"			value="${build.c.home}/lib"/>
+  <property name="src.home"					value="src"/>
+  <property name="src.java.home"			value="${src.home}/java"/>
+  <property name="src.c.home"				value="${src.home}/c"/>
+  <property name="docs.home"				value="doc"/>
+  <property name="docs.javadocs.home"		value="${docs.home}/javadocs"/>
+  <property name="dist.home"				value="dist"/>
+  <property name="dist.java.home"			value="${dist.home}/jar"/>
+  <property name="dist.c.home"				value="${dist.home}/dll/win32/wnt"/>
+  <property name="package.home"				value="package"/>
+  <property name="include.home"				value="include"/>
+  <property name="lib.home"					value="lib"/>  
+  <property name="test.home"				value="test"/>
+  <property name="ant.tasks.home"			value="tasks"/>
+  
+  
+<!--  ================== Application Defined Properties =================== -->
+
+<!--
+
+  exclude.fileset	   RegExpression for exclude files in "compile" 
+					   and "dist" targets.
+
+  vendor.name	       Value of vendor name.
+
+-->
+
+  <property name="exclude.fileset"				value="**/vssver.scc,**/*.cvsignore,**/CVS,**/*.bak,**/*.java_,**/*.*_old,**/_old.*,.classpath,.project"/>
+
+  <property name="jni.native.namespace"			value="net/sf/jmsmq"/>
+
+  <property name="vendor.name"					value="Jorge Ruesga"/>
+
+  <property name="vendor.legal.notice"			value="
+  Copyright (C) 2006 Jorge Ruesga
+  
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License
+  as published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA." />
+
+
+<!--  ==================== Compilation Control Options ==================== -->
+
+<!--
+
+  These properties control option settings on the Javac compiler when it
+  is invoked using the <javac> task.
+
+  compile.debug        Should compilation include the debug option?
+
+  compile.deprecation  Should compilation include the deprecation option?
+
+  compile.optimize     Should compilation include the optimize option?
+
+-->
+
+  <property name="compile.debug"				value="true"/>
+  <property name="compile.deprecation"			value="false"/>
+  <property name="compile.optimize"				value="true"/>
+
+
+<!--
+
+  These properties control option settings on the gcc compiler when it
+  is invoked using the <cc> task.
+
+  compile.debug        Should compilation include the debug option?
+
+  compile.deprecation  Should compilation include the deprecation option?
+
+  compile.optimize     Should compilation include the optimize option?
+
+-->
+
+  <property name="compile.name"						value="gcc"/>
+  <property name="compile.multithread"				value="true"/>
+  <property name="compile.rebuild"					value="true"/>
+  <property name="compile.relentless"				value="true"/>
+  <property name="compile.type"						value="shared"/>
+
+
+<!--  ==================== Javadocs Control Options ==================== -->
+
+<!--
+
+  These properties control option settings on the Javadocs task.
+
+  javadoc.access        Level of javadoc access
+
+-->
+
+  <property name="javadoc.access"				value="public"/>
+
+
+
+<!-- ==================== External Dependencies =========================== -->
+
+<!--
+
+  Use property values to define the locations of external JAR files on which
+  your application will depend.  In general, these values will be used for
+  two purposes:
+  * Inclusion on the classpath that is passed to the Javac compiler
+  * Being copied into the "/WEB-INF/lib" directory during execution
+    of the "deploy" target.
+
+  Because we will automatically include all of the Java classes that Tomcat 4
+  exposes to web applications, we will not need to explicitly list any of those
+  dependencies.  You only need to worry about external dependencies for JAR
+  files that you are going to include inside your "/WEB-INF/lib" directory.
+-->
+
+	<taskdef resource="cpptasks.tasks">
+	  <classpath>
+		<pathelement location="${basedir}/${ant.tasks.home}/cpptasks.jar"/>
+	  </classpath>
+	</taskdef>
+	<typedef resource="cpptasks.types">
+	  <classpath>
+		<pathelement location="${basedir}/${ant.tasks.home}/cpptasks.jar"/>
+	  </classpath>
+	</typedef>
+
+
+<!-- ==================== Compilation Classpath =========================== -->
+
+<!--
+
+  Rather than relying on the CLASSPATH environment variable, Ant includes
+  features that makes it easy to dynamically construct the classpath you
+  need for each compilation.  The example below constructs the compile
+  classpath to include the servlet.jar file, as well as the other components
+  that Tomcat makes available to web applications automatically, plus anything
+  that you explicitly added.
+
+-->
+
+  <path id="compile.classpath">
+
+    <!-- Include all JAR files that will be included -->
+
+	<!-- Application Library -->
+	<fileset dir="${lib.home}">
+		<include name="**/*.jar"/>
+    </fileset>
+
+  </path>
+
+
+<!-- ==================== Clean Target ==================================== -->
+
+<!--
+
+  The "clean" target deletes any previous "build" and "dist" directory,
+  so that you can be ensured the application can be built from scratch.
+
+-->
+
+  <target name="clean" description="Deletes any previous 'build' and 'dist' directory">
+
+	<!-- Delete dist directory -->
+	<delete dir="${build.home}" includeEmptyDirs="true"/>
+	<delete dir="${docs.home}" includeEmptyDirs="true"/>
+    <delete dir="${dist.home}" includeEmptyDirs="true"/>
+
+  </target>
+
+<!-- ==================== Java Compile Target ================================== -->
+
+<!--
+
+  The "java-compile" target transforms java source files (from your "src" directory)
+  into object files in the appropriate location in the build directory.
+
+-->
+
+  <target name="java-compile" depends="clean" description="Compile the java source files">
+
+    <!-- Compile Java classes as necessary -->
+    <mkdir dir="${build.java.home}"/>
+	<!-- jmsmq -->
+    <javac srcdir="${src.java.home}"
+           destdir="${build.java.home}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           optimize="${compile.optimize}"
+		   includes="${app.path}/**">
+        <classpath refid="compile.classpath"/>
+    </javac>	
+	<!-- test -->
+	<javac srcdir="${src.java.home}"
+           destdir="${build.java.home}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           optimize="${compile.optimize}"
+		   includes="${app.test.path}/**">
+        <classpath refid="compile.classpath"/>
+    </javac>
+
+  </target>
+
+<!-- ==================== JNI Target ================================== -->
+
+<!--
+
+  The "jni" target generate JNI´s C header files for the specified classes for a native
+  C implementacion.
+
+-->
+
+  <target name="jni" depends="java-compile" description="Generate JNI´s C header files">
+
+    <!-- Generate java headers for JNI native support -->
+	<mkdir dir="${src.c.home}/${jni.native.namespace}" />
+    <javah destdir="${src.c.home}/${jni.native.namespace}" verbose="no" force="yes" implementation="sun" classpath="${build.java.home}">
+		<class name="net.sf.jmsmq.MSMQQueueFactory"/>
+		<class name="net.sf.jmsmq.MSMQQueue"/>		
+	</javah>
+
+  </target>
+
+<!-- ==================== C Compile Target ================================== -->
+
+<!--
+
+  The "c-compile" target transforms C source files (from your "src" directory)
+  into object files in the appropriate location in the build directory.
+
+-->
+
+  <target name="c-compile" depends="clean,jni" description="Compile the C source files">
+
+		<!-- Reimp MSMQ Libraries -->		
+		<exec executable="${gcc.home}/bin/reimp" dir="${lib.home}" failonerror="true">
+			<arg line="mqrt.lib" />
+		</exec>
+		<mkdir dir="${build.c.lib.home}"/>
+		<move todir="${build.c.lib.home}" overwrite="true">
+			<fileset file="${lib.home}/*.*" excludes="${exclude.fileset},**/*.lib"/>
+		</move>
+		
+
+		<!-- Compile C classes as necessary -->
+		<mkdir dir="${build.c.home}/${jni.native.namespace}"/>
+		<cc name="${compile.name}" 
+			multithreaded="${compile.multithread}" 
+			rebuild="${compile.rebuild}"
+			relentless="${compile.relentless}"
+			objdir="${build.c.home}/${jni.native.namespace}" 			
+			link="${compile.type}" 			
+			outtype="${compile.type}"
+			outfile="${build.c.home}/${app.name}.dll" >
+
+			<includepath description="GCC Includes" path="${gcc.home}/include" />
+			<includepath description="JNI Includes" path="${java.home}/include" />
+			<includepath description="JNI Includes" path="${java.home}/include/win32" />
+			<includepath description="MSMQ Includes" path="${include.home}" />
+
+			<libset casesensitive="false" dir="${build.c.lib.home}" libs="mqrt" />
+
+			<fileset description="JNI C++ Classes" casesensitive="false" dir="${src.c.home}" includes="**/*.cpp" excludes="**/Main.cpp" />
+
+			<target arch="i386" />
+			<target cpu="i386" />
+			<target osfamily="windows" />
+
+			<linker debug="false" />
+			<linkerarg value="--kill-at" />
+			<linkerarg value="-W1" />
+
+			<versioninfo id="${app.name}"
+						 companyname="${vendor.name}" 
+						 filecomments="${app.description}" 
+						 fileversion="1.0.0.0" 
+						 internalname="${app.name}"
+						 legalcopyright="${vendor.legal.notice}"
+						 legaltrademark="${vendor.legal.notice}"
+						 originalfilename="${app.name}.dll"
+						 productname="${app.name}"
+						 productversion="1.0.0.0" />
+		</cc>
+
+  </target>
+
+
+<!-- ==================== Javadoc Target ================================== -->
+
+<!--
+
+  The "javadoc" target creates Javadoc API documentation for the Java
+  classes included in your application.  Normally, this is only required
+  when preparing a distribution release, but is available as a separate
+  target in case the developer wants to create Javadocs independently.
+
+-->
+
+  <target name="javadoc" depends="clean" description="Creates Javadoc API documentation for the Java classes">
+
+	<!-- Create build directory -->
+	<delete dir="${docs.javadocs.home}" includeEmptyDirs="true"/>
+    <mkdir dir="${docs.javadocs.home}"/>
+    
+	<!-- Make Javadoc documentation -->
+    <javadoc packagenames="${app.package}.*"
+             sourcepath="${src.java.home}"
+             destdir="${docs.javadocs.home}"
+			 access="${javadoc.access}"
+             author="false"
+             version="true"
+             use="true"
+             windowtitle="${app.description} API"
+             doctitle="${app.description} API"
+             bottom="${vendor.name} &#169; 2006. All rigths reserved.">
+             
+             <classpath refid="compile.classpath"/>
+    </javadoc>
+
+  </target>
+
+<!-- ==================== Java Dist Target ===================================== -->
+
+<!--
+
+  The "java-dist" target creates a java binary distribution of your application
+  in a directory structure ready to be archived in a tar.gz or zip file.
+  Note that this target archieved binary and source files.
+-->
+
+  <target name="java-dist" depends="java-compile,javadoc" description="Creates a java binary and source distribution">
+	
+	<!-- Create dist directory -->
+	<mkdir dir="${dist.java.home}"/>
+	
+	<!-- Copy java to include on distribution -->
+	<copy todir="${build.java.home}/" >
+	  <fileset dir="${src.java.home}" excludes="${exclude.fileset},**/*.java"/>
+	</copy>
+
+	<!-- Build binary distribution file -->
+	<!-- test -->
+	<jar basedir="${build.java.home}"
+				jarfile="${dist.java.home}/${app.name}-test.jar"
+				includes="${app.test.path}/**/*.*"
+				excludes="${exclude.fileset}" />
+	<copy file="${dist.java.home}/${app.name}-test.jar" todir="${test.home}" failonerror="true" overwrite="true" />
+	<!-- jmsmq -->
+	<delete dir="${build.java.home}/${app.test.path}" includeemptydirs="true" />
+	<jar basedir="${build.java.home}"
+				jarfile="${dist.java.home}/${app.name}.jar"
+				excludes="${exclude.fileset}" />
+	<copy file="${dist.java.home}/${app.name}.jar" todir="${test.home}" failonerror="true" overwrite="true" />
+	
+
+  </target>
+
+<!-- ==================== C Dist Target ===================================== -->
+
+<!--
+
+  The "c-dist" target creates a C binary distribution of your application
+  in a directory structure ready to be archived in a tar.gz or zip file.
+  Note that this target archieved binary and source files.
+-->
+
+  <target name="c-dist" depends="c-compile" description="Creates a C binary and source distribution">
+
+	<!-- Create dist directory -->
+	<mkdir dir="${dist.c.home}"/>
+	<copy file="${build.c.home}/libjmsmq.dll.so" tofile="${dist.c.home}/${app.name}.dll" failonerror="true" overwrite="true"/>
+
+	<!-- Test -->
+	<copy file="${dist.c.home}/${app.name}.dll" todir="${test.home}" failonerror="true" overwrite="true" />
+
+  </target>
+
+<!-- ==================== Dist Target ===================================== -->
+
+<!--
+
+  The "dist" target creates a binary distribution of your application
+  in a directory structure ready to be archived in a tar.gz or zip file.
+  Note that this target archieved binary and source files.
+-->
+
+  <target name="dist" depends="clean,java-dist,c-dist" description="Creates a binary and source distribution" >
+		
+	<!-- Create package directory -->
+	<delete dir="${package.home}" includeEmptyDirs="true"/>
+	<mkdir dir="${package.home}"/>
+
+	<!-- Zip Binary Distribution -->
+	<zip destfile="${package.home}/${app.name}-${app.version}-bin.zip" compress="true" filesonly="false">
+		<fileset dir="." includes="CHANGES,LICENSE,README,**/${docs.home}/**,**/${dist.home}/**" excludes="${exclude.fileset},**/*-test.jar"/>
+	</zip>
+
+	<!-- Zip Source Distribution -->
+	<zip destfile="${package.home}/${app.name}-${app.version}-src.zip" compress="true" filesonly="false">
+		<fileset dir="." excludes="${exclude.fileset},**/${build.home}/**,**/${dist.home}/**,**/${docs.home}/**,**/${package.home}/**,**/${test.home}/**"/>
+	</zip>
+
+	<!-- Zip Test Distribution -->
+	<zip destfile="${package.home}/${app.name}-${app.version}-test.zip" compress="true" filesonly="false" update="false">
+		<fileset dir="${test.home}" excludes="${exclude.fileset}"/>
+	</zip>
+	<zip destfile="${package.home}/${app.name}-${app.version}-test.zip" compress="true" filesonly="false" update="true">
+		<fileset dir="." includes="CHANGES,LICENSE,README" excludes="${exclude.fileset}"/>
+	</zip>
+
+  </target>
+
+
+<!-- ==================== All Target ====================================== -->
+
+<!--
+
+  The "all" target is a shortcut for running the "clean" target followed
+  by the "compile" target, to force a complete recompile.
+
+-->
+
+  <target name="all" depends="dist" description="Clean, compile and make the release distribution" />
+
+</project>

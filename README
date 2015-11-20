@@ -1,0 +1,17 @@
+This library is intended to create a package of Java classes, based on JNI,
+to access to Microsoft Message Queuing Server 3.0 interface. This library
+offers support to the next actions:
+
+  · Message Queueing Server´s Actions: as create new queue, destroy existing
+  queues, enumerate queues, search existing queues, ..., for private and 
+  public queues (including transactional and no transactional queues)
+
+  · Queue´s Actions: as recover queue properties information
+
+  · Message Queue´s Actions: as receive, peek and send message (with UTF-8
+  and UNICODE auto discover), and purge queue (including transactional and 
+  no transactional message)
+
+The library recreates the MSMQ library, an has a representacion of MQQueueInfo
+(as a factory), MSMQQueue and MSMQMessage on Java classes, that it simplifies
+the use of the library.

@@ -1,0 +1,21 @@
+For compile this project you must have instaled the next Open Source
+buildind libraries:
+
+ - J2SDK 1.4.2 or newer (http://java.sun.com)
+ - Ant 1.6.5 or newer (http://ant.apache.org)
+ - Ant 3.4.2 or newer (http://www.mingw.org). You need to download GCC, 
+   MinGW Utilities, Windows API, binutils, gdb and make subprojects
+
+Before compile the project, you must configure the file "build.properties", 
+setting the value of the properties according your programs values:
+
+java.home --> Path to the java home directory (Need for found JNI headers)
+gcc.home --> Path to the minggw home directory (Need for compile c library)
+
+
+You can compile using the next commands (over project root directory):
+
+ant --> For create a complete distribution
+ant java-compile --> For compile java sources
+ant c-compile --> For compile c sources (depends of java-compile for 
+generate jmsmq headers)
